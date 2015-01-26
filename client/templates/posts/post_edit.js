@@ -1,3 +1,15 @@
+Template.postEdit.created = function() {
+  Session.set('postEditErrors', {});
+}
+Template.postEdit.helpers({
+  errorMessage: function(field) {
+    return Session.get('postEditErrors')[field];
+  },
+  errorClass: function (field) {
+    return !!Session.get('postEditErrors')[field] ? 'has-error' : '';
+  }
+});
+
 Template.postEdit.events({
 	'submit form': function(e) {
 		e.preventDefault();
@@ -12,11 +24,11 @@ Template.postEdit.events({
 		Meteor.call('postUpdate', currentPostId, postProperties, function(error, result) {
 			// display the error to the user and abort
 			if (error)
-				return alert(error.reason);
+				throwError(error.reason);
 
 			// show this result but route anyway
 			if (result.postExists)
-				alert('This link has already been posted');
+				throwError('This link has already been posted');
 
 			Router.go('postPage', {_id: result._id});
 		});
